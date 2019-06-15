@@ -1,0 +1,53 @@
+stages:
+  - build
+  - stage
+  - production
+
+variables:
+  CONTAINER_TEST_IMAGE: registry.https://pwslab.org/mk/demo-java-2.git:$CI_BUILD_REF_NAME
+  CONTAINER_RELEASE_IMAGE: registry.https://pwslab.org/mk/demo-java-2.git:latest
+
+
+compile-go-1.8-debian:
+  image: golang:1.8
+  stage: build
+  script:
+# Dumb workaround because I'm too lazy to mess with the $GOPATH
+  - export BUILDPATH=$(pwd)
+  - mkdir -pv /go/src/https://pwslab.org/mk/demo-java-2.git
+  - cp -Rv ./* /go/src/https://pwslab.org/mk/demo-java-2.git
+  - cd /go/src/https://pwslab.org/mk/demo-java-2.git
+  - go get -v .
+  - go build main.go
+# Dumb workaround pt2
+  - cp -v /go/bin/redacted $BUILDPATH/
+  artifacts:
+    when: on_success
+    paths:
+    - ./redacted
+  cache:
+    paths:
+    - ./redacted
+
+stage-redacted-alpine:
+  services:
+  - docker:dind
+  stage: stage
+  when: on_success
+  only:
+  - master
+  script:
+    - docker login -u pwslab-ci-token -p $CI_BUILD_TOKEN registry.example.com
+    - docker build -t registry.https://pwslab.org/mk/demo-java-2.git .
+    - docker push registry.https://pwslab.org/mk/demo-java-2.git
+    - docker rm -f redacted-staging
+    - docker run -d -p 9090:9090 --name redacted-staging registry.pwslab.org/mk/demo-java-2.git
+
+production-redacted-alpine:
+  image: alpine
+  stage: production
+  when: on_success
+  only:
+  - production
+  script:
+    - echo "Replace me with deploy scripts!"
