@@ -4,8 +4,8 @@ stages:
   - production
 
 variables:
-  CONTAINER_TEST_IMAGE: registry.https://pwslab.org/mk/demo-java-2.git:$CI_BUILD_REF_NAME
-  CONTAINER_RELEASE_IMAGE: registry.https://pwslab.org/mk/demo-java-2.git:latest
+  CONTAINER_TEST_IMAGE: registry.pwslab.org/mk/demo-java-2.git:$CI_BUILD_REF_NAME
+  CONTAINER_RELEASE_IMAGE: registry.pwslab.org/mk/demo-java-2.git:latest
 
 
 compile-go-1.8-debian:
@@ -14,9 +14,9 @@ compile-go-1.8-debian:
   script:
 # Dumb workaround because I'm too lazy to mess with the $GOPATH
   - export BUILDPATH=$(pwd)
-  - mkdir -pv /go/src/https://pwslab.org/mk/demo-java-2.git
-  - cp -Rv ./* /go/src/https://pwslab.org/mk/demo-java-2.git
-  - cd /go/src/https://pwslab.org/mk/demo-java-2.git
+  - mkdir -pv /go/src/pwslab.org/mk/demo-java-2.git
+  - cp -Rv ./* /go/src/pwslab.org/mk/demo-java-2.git
+  - cd /go/src/pwslab.org/mk/demo-java-2.git
   - go get -v .
   - go build main.go
 # Dumb workaround pt2
@@ -38,8 +38,8 @@ stage-redacted-alpine:
   - master
   script:
     - docker login -u pwslab-ci-token -p $CI_BUILD_TOKEN registry.example.com
-    - docker build -t registry.https://pwslab.org/mk/demo-java-2.git .
-    - docker push registry.https://pwslab.org/mk/demo-java-2.git
+    - docker build -t registry.pwslab.org/mk/demo-java-2.git .
+    - docker push registry.pwslab.org/mk/demo-java-2.git
     - docker rm -f redacted-staging
     - docker run -d -p 9090:9090 --name redacted-staging registry.pwslab.org/mk/demo-java-2.git
 
