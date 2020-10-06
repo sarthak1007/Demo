@@ -21,6 +21,12 @@ pipeline {
           }
         }
 
+        stage('') {
+          steps {
+            archiveArtifacts(allowEmptyArchive: true, artifacts: 'Test')
+          }
+        }
+
       }
     }
 
