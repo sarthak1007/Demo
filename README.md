@@ -88,3 +88,4 @@ The original command was:
 * maven: `brew install maven`
 
 new
+new2
